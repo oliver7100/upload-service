@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./proto";
+
+message ImageInfo {
+    string type = 1;
+}
+
+message UploadImageRequest {
+    oneof data {
+        ImageInfo info = 1;
+        bytes chunk_data = 2;
+    }
+}
+
+message UploadImageResponse {
+    string uri = 1;
+    int32 size = 2;
+}
+
+service UploadService {
+    rpc UploadImage(stream UploadImageRequest) returns (UploadImageResponse) {};
+}
