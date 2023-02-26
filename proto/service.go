@@ -2,32 +2,24 @@ package proto
 
 import (
 	"bytes"
-	"fmt"
+	"encoding/base64"
 	"io"
-	"os"
+
+	imagestore "github.com/oliver7100/upload-service/internal/image-store"
 )
 
 type UploadService struct {
 	UnimplementedUploadServiceServer
+	Store imagestore.IStorage
 }
 
 func (s *UploadService) UploadImage(stream UploadService_UploadImageServer) error {
-	fmt.Println("test")
-
-	imageData := bytes.Buffer{}
-
-	file, _ := os.Create("file.jpg")
-
-	defer file.Close()
+	buffer := bytes.Buffer{}
 
 	for {
-
-		fmt.Println("run")
-
 		req, err := stream.Recv()
 
 		if err == io.EOF {
-			fmt.Println("no more data")
 			break
 		}
 
@@ -35,20 +27,20 @@ func (s *UploadService) UploadImage(stream UploadService_UploadImageServer) erro
 			return err
 		}
 
-		_, err = imageData.Write(req.GetChunkData())
+		_, err = buffer.Write(req.GetChunkData())
 
 		if err != nil {
 			return err
 		}
-		fmt.Println("dadada")
 	}
 
-	fmt.Println("dada")
+	res, err := s.Store.SaveImage(base64.StdEncoding.EncodeToString(buffer.Bytes()))
 
-	file.Write(imageData.Bytes())
+	if err != nil {
+		return err
+	}
 
 	return stream.SendAndClose(&UploadImageResponse{
-		Uri:  "adadad",
-		Size: 100,
+		Uri: res.Url,
 	})
 }
