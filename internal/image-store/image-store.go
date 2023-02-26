@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/google/uuid"
 )
 
 type IStorage interface {
@@ -29,7 +30,7 @@ type Base64EncodedImage string
 
 func (s *CloudinaryStorage) SaveImage(item string) (*SaveImageResult, error) {
 	response, err := s.client.Upload.Upload(context.Background(), item, uploader.UploadParams{
-		PublicID: "t",
+		PublicID: uuid.New().String(),
 	})
 
 	if err != nil {
