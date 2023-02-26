@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"os"
 
@@ -27,7 +28,7 @@ func main() {
 
 	l, err := net.Listen(
 		"tcp",
-		os.Getenv("PORT"),
+		fmt.Sprintf(":%s", os.Getenv("PORT")),
 	)
 
 	if err != nil {

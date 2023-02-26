@@ -2,6 +2,7 @@ package imagestore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -29,9 +30,15 @@ type CloudinaryStorage struct {
 type Base64EncodedImage string
 
 func (s *CloudinaryStorage) SaveImage(item string) (*SaveImageResult, error) {
+	fmt.Println(item)
+
 	response, err := s.client.Upload.Upload(context.Background(), item, uploader.UploadParams{
-		PublicID: uuid.New().String(),
+		PublicID: uuid.NewString(),
 	})
+
+	fmt.Println(response.Error.Message)
+
+	fmt.Println(response.AssetID)
 
 	if err != nil {
 		return nil, err

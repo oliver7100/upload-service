@@ -2,8 +2,8 @@ package proto
 
 import (
 	"bytes"
-	"encoding/base64"
 	"io"
+	"os"
 
 	imagestore "github.com/oliver7100/upload-service/internal/image-store"
 )
@@ -34,7 +34,21 @@ func (s *UploadService) UploadImage(stream UploadService_UploadImageServer) erro
 		}
 	}
 
-	res, err := s.Store.SaveImage(base64.StdEncoding.EncodeToString(buffer.Bytes()))
+	file, err := os.CreateTemp("", "fmf-*.jpeg")
+
+	defer os.Remove(file.Name())
+
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(buffer.Bytes())
+
+	if err != nil {
+		return err
+	}
+
+	res, err := s.Store.SaveImage(file.Name())
 
 	if err != nil {
 		return err
